@@ -22,10 +22,13 @@ public class StudentController {
     @PostMapping("/students")
     public ResponseEntity<String> addStudents(@RequestBody List<Student> newStudents) {
         if (newStudents == null || newStudents.isEmpty()) {
-            return ResponseEntity.badRequest().body("Aucun étudiant fourni");
+            return ResponseEntity.badRequest().body("Aucun étudiant fourni dans le corps de la requête");
         }
+
         students.addAll(newStudents);
-        return ResponseEntity.ok("Étudiants ajoutés avec succès (" + newStudents.size() + " ajoutés)");
+
+        String message = "Étudiants ajoutés avec succès (" + newStudents.size() + " ajoutés)";
+        return ResponseEntity.ok(message);
     }
 
     @GetMapping(value = "/students", produces = {MediaType.TEXT_PLAIN_VALUE})
