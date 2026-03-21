@@ -31,27 +31,47 @@ public class StudentController {
         return ResponseEntity.ok(message);
     }
 
-    @GetMapping(value = "/students", produces = {MediaType.TEXT_PLAIN_VALUE})
-    public ResponseEntity<String> getStudentNames(
-            @RequestHeader(value = "Accept", required = false) String acceptHeader) {
+    @GetMapping("/students")
+    public ResponseEntity<?> getStudentNames(
+            @RequestHeader(value = "Accept", defaultValue = "*/*") String acceptHeader) {
+
+        System.out.println("Accept header reçu : " + acceptHeader);
 
         if (acceptHeader == null ||
-                !acceptHeader.contains(MediaType.TEXT_PLAIN_VALUE) &&
-                        !acceptHeader.contains("*/*")) {
+                (!acceptHeader.contains(MediaType.TEXT_PLAIN_VALUE) &&
+                        !acceptHeader.contains(MediaType.APPLICATION_JSON_VALUE) &&
+                        !acceptHeader.contains("*/*"))) {
 
             return ResponseEntity
                     .status(HttpStatus.NOT_ACCEPTABLE)
+                    .contentType(MediaType.TEXT_PLAIN)
                     .body("Format non supporté");
         }
 
         if (students.isEmpty()) {
-            return ResponseEntity.ok("Aucun étudiant enregistré");
+            if (acceptHeader.contains(MediaType.TEXT_PLAIN_VALUE)) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .body("Aucun etudiant enregistré");
+            } else {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(new ArrayList<>());
+            }
         }
 
-        String names = students.stream()
-                .map(s -> s.getFirstName() + " " + s.getLastName())
-                .collect(Collectors.joining("\n"));
+        if (acceptHeader.contains(MediaType.TEXT_PLAIN_VALUE)) {
+            String names = students.stream()
+                    .map(s -> s.getFirstName() + " " + s.getLastName())
+                    .collect(Collectors.joining("\n"));
 
-        return ResponseEntity.ok(names);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(names);
+        } else {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(students);
+        }
     }
 }
