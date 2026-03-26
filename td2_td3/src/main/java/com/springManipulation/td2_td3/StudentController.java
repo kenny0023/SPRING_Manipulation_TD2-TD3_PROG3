@@ -42,8 +42,8 @@ public class StudentController {
             students.addAll(newStudents);
 
             return ResponseEntity
-                    .status(HttpStatus.CREATED)           // 201
-                    .header("Location", "/students")      // optionnel : indique où voir la ressource créée
+                    .status(HttpStatus.CREATED)
+                    .header("Location", "/students")
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(newStudents.size() + " étudiant(s) créé(s) avec succès");
 
